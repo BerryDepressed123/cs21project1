@@ -572,17 +572,17 @@ backtrack:
 	# $a2 = pieces
 	# $a3 = numPieces 
 
-	#have to fix for unsaved registers
-
 	#preamble
-	subu	$sp, $sp, 28			#make stack frame
-	sw	$ra, 24($sp)			#store $ra
-	sw	$s0, 20($sp)			#store $s0
-	sw	$s1, 16($sp)			#store $s1
-	sw	$s2, 12($sp)			#store $s2
-	sw	$s3, 8($sp)			#store $s3
-	sw	$s4, 4($sp)			#store $s4
-	sw	$s5, 0($sp)			#store $s5
+	subu	$sp, $sp, 36			#make stack frame
+	sw	$ra, 32($sp)			#store $ra
+	sw	$s0, 28($sp)			#store $s0
+	sw	$s1, 24($sp)			#store $s1
+	sw	$s2, 20($sp)			#store $s2
+	sw	$s3, 16($sp)			#store $s3
+	sw	$s4, 12($sp)			#store $s4
+	sw	$s5, 8($sp)			#store $s5
+	sw	$s6, 4($sp)			#store $s6
+	sw	$s7, 0($sp)			#store $s7
 	#preamble
 
 	move	$s2, $a0			# $s2 = currGrid[70]
@@ -619,6 +619,7 @@ bt_max_offset:
 	li	$t1, 6				# $t1 = 6
 	sub	$s7, $t1, $v0			# $s7: max_offset = 6 - result of get_max_x_of_piece
 	
+bt_copy:
 	li	$a0, 8				# $a0 = 8
 	mult	$a0, $s5			#multiplying numPieces by 8
 	mflo	$a0				# $a0 = numPieces * 8
@@ -635,6 +636,29 @@ bt_max_offset:
 
 	jal	copy				#call copy 
 
+	li	$s1, 0				# $s1: offset = 0
+	
+bt_inner_loop_b:
+	bge	$s1, $s7, bt_inner_loop_e	#branch to end if offset >= max_offset
+	
+	li	$a0, 1				#allocate 1 byte
+	li	$v0, 9				#preparing for sbrk
+	syscall
+	move	$a3, $v0			# $a3 = &success
+	
+	move	$a0, $s2			# $a0 = currGrid
+	
+	li	$t0, 8				# $t0 = 8
+	mult	$t0, $s0			#multiplying i by 8
+	mflo	$a1				# $a1 = i * 8
+	add	$a1, $a1, $s4			# $a1 = pieces + i * 8
+
+	move	$a2, $s1			# $a2 = offset
+	
+	jal	drop_piece_in_grid 		#call drop_piece_in_grid
+
+bt_inner_loop_e:
+
 bt_outer_loop_inc:
 	addi	$s0, $s0, 1			# i += 1
 	j	bt_outer_loop_b			#jump to the start of the loop
@@ -644,18 +668,17 @@ bt_outer_loop_e:
 	li	$v0, 0				# $v0 = result
 
 backtrack_e:
-
-	#have to fix for unsaved registers
-
 	#end
-	lw	$ra, 24($sp)			#load values from respective stack frame
-	lw	$s0, 20($sp)			
-	lw	$s1, 16($sp)			
-	lw	$s2, 12($sp)			
-	lw	$s3, 8($sp)			
-	lw	$s4, 4($sp)			
-	lw	$s5, 0($sp)			
-	addu	$sp, $sp, 28			#deallocate stack frame
+	lw	$ra, 32($sp)			#load values from respective stack frame
+	lw	$s0, 28($sp)			
+	lw	$s1, 24($sp)			
+	lw	$s2, 20($sp)			
+	lw	$s3, 16($sp)			
+	lw	$s4, 12($sp)			
+	lw	$s5, 8($sp)
+	lw	$s6, 4($sp)
+	lw	$s7, 0($sp)			
+	addu	$sp, $sp, 36			#deallocate stack frame
 	#end	
 
 	jr	$ra				#return

@@ -657,7 +657,20 @@ bt_inner_loop_b:
 	
 	jal	drop_piece_in_grid 		#call drop_piece_in_grid
 
+	#is $a3 still preserved?
+	lb	$t0, 0($a3)			# $t0: success
+	bne	$t0, 1, bt_inner_loop_inc	#branch if $t0 != 1
+	
+	add	$t0, $s0, $s6			# $t0: chosenCopy + i
+	li	$t1, 1				# $t1 = 1
+	sb	$t1, 0($t0)			# chosenCopy[i] = 1
+	
+bt_inner_loop_inc:
+	addi	$s1, $s1, 1			# offset += 1
+	j	bt_inner_loop_b			#jump to the start of the loop
+
 bt_inner_loop_e:
+
 
 bt_outer_loop_inc:
 	addi	$s0, $s0, 1			# i += 1

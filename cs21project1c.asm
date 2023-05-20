@@ -589,9 +589,25 @@ backtrack:
 	move	$s4, $a2			# $s4 = pieces
 	move	$s5, $a3			# $s5 = numPieces
 
-backtrack_e:
-	move	$v0, $s0			# $v0 = result
+	lw	$a1, 16($sp)			# $a1 = $s1 = final_grid?
+	jal	is_equal_grids			#call is_equal_grids(currGrid, final_grid)
+	move	$t0, $v0			# $t0: result of call
+	li	$t1, 1				# $t1 = 1
+	bne	$t0, $t1, skip_if_backtrack	#branch if $t0 != 1
 	
+	li	$v0, 1				# result = 1
+	j	backtrack_e			#jump to end
+	
+skip_if_backtrack:
+	
+	
+backtrack_loop_b:
+
+
+backtrack_loop_e:
+	move	$v0, $s0			# $v0 = result
+
+backtrack_e:
 	#end
 	lw	$ra, 24($sp)			#load values from respective stack frame
 	lw	$s0, 20($sp)			

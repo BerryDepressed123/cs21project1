@@ -455,6 +455,9 @@ fb_rows_loop_m:
 	j	fb_rows_loop_b			#jump to the start of the loop
 	
 fb_rows_loop_e:
+	#marks the end of fb_rows_loop
+	
+freeze_blocks_e:
 	move	$v0, $a0			# $v0 = grid
 	
 	#end
@@ -464,7 +467,44 @@ fb_rows_loop_e:
 	
 	jr	$ra				#return
 
+get_max_x_of_piece:
+	# $a0 = piece[8]
+	
+	#preamble
+	subu	$sp, $sp, 8			#make stack frame
+	sw	$ra, 4($sp)			#store $ra
+	sw 	$s0, 0($sp)			#store $s0
+	#preamble
 
+	li	$s0, -1				# $s0: max_x = -1
+	li	$t0, 1				# $t0: i = 1
+	
+gmop_loop_b:
+	bge	$t0, 8, gmop_loop_e		#branch to end if i >= 8
+	
+	add	$t1, $a0, $t0			# $t1 = piece + i
+	lb	$t1, 0($t1)			# $t1 = piece[i]
+	
+	bge	$s0, $t1, gmop_loop_inc		#branch to loop inc if max_x >= piece[i]
+	move	$s0, $t1			# max_x = piece[i]
+
+gmop_loop_inc:
+	addi	$t0, $t0, 2			# i += 2
+	j 	gmop_loop_b			#jump to the start of the loop
+
+gmop_loop_e:
+	#marks the end of gmop_loop
+
+get_max_x_of_piece_e:
+	move	$v0, $s0			# $v0 = max_x
+
+	#end
+	lw	$ra, 4($sp)			#load values from respective stack frame
+	lw	$s0, 0($sp)		
+	addu	$sp, $sp, 8			#deallocate stack frame	
+	#end
+	
+	jr	$ra				#return 
 
 
 .data

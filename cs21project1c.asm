@@ -572,6 +572,8 @@ backtrack:
 	# $a2 = pieces
 	# $a3 = numPieces 
 
+	#have to fix for unsaved registers
+
 	#preamble
 	subu	$sp, $sp, 28			#make stack frame
 	sw	$ra, 24($sp)			#store $ra
@@ -583,7 +585,6 @@ backtrack:
 	sw	$s5, 0($sp)			#store $s5
 	#preamble
 
-	li	$s0, 0				# $s0: result = 0
 	move	$s2, $a0			# $s2 = currGrid[70]
 	move	$s3, $a1			# $s3 = chosen
 	move	$s4, $a2			# $s4 = pieces
@@ -599,22 +600,53 @@ backtrack:
 	j	backtrack_e			#jump to end
 	
 skip_if_backtrack:
-	li	$t0, 0				# $t0: i = 0
+	li	$s0, 0				# $s0: i = 0
 	
 bt_outer_loop_b:
-	bge	$t0, $s5, bt_outer_loop_e		
-	add	$t1, $t0, $s3			# $t1 = chosen + i
+	bge	$s0, $s5, bt_outer_loop_e		
+	
+	add	$t1, $s0, $s3			# $t1 = chosen + i
 	lb	$t1, 0($t1)			# $t1 = chosen[i]
+	beq	$t1, 1, bt_outer_loop_inc	#continue if chosen[i] == 1
+
+bt_max_offset:
+	li	$t1, 8				# $t1 = 8
+	mult	$s0, $t1			#multiplying i by 8
+	mflo	$a0				# $a0 = i * 8
+	add	$a0, $a0, $s4			# $a0 = pieces + i * 8
+	
+	jal	get_max_x_of_piece		#call get_max_x_of_piece
+	li	$t1, 6				# $t1 = 6
+	sub	$s7, $t1, $v0			# $s7: max_offset = 6 - result of get_max_x_of_piece
+	
+	li	$a0, 8				# $a0 = 8
+	mult	$a0, $s5			#multiplying numPieces by 8
+	mflo	$a0				# $a0 = numPieces * 8
+	li	$v0, 9				#preparing for sbrk
+	syscall
+	move	$s6, $v0			# $s6 = chosenCopy
+
+	move 	$a0, $s3			# $a0 = chosen
+	move	$a1, $s6			# $a1 = chosenCopy
+
+	li	$t0, 8				# $t0 = 8
+	mult	$t0, $s5			#multiplying numPieces by 8
+	mflo	$a2				# $a2 = numPieces * 8
+
+	jal	copy				#call copy 
 
 bt_outer_loop_inc:
-	addi	$t0, $t0, 1			# i += 1
+	addi	$s0, $s0, 1			# i += 1
 	j	bt_outer_loop_b			#jump to the start of the loop
 
 bt_outer_loop_e:
 
-	move	$v0, $s0			# $v0 = result
+	li	$v0, 0				# $v0 = result
 
 backtrack_e:
+
+	#have to fix for unsaved registers
+
 	#end
 	lw	$ra, 24($sp)			#load values from respective stack frame
 	lw	$s0, 20($sp)			

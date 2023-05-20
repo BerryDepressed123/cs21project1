@@ -532,16 +532,16 @@ cptp_cols_loop_b:
 	
 	move	$t4, $a0			# $t4 = pieceGrid
 	add	$t4, $t3, $t4			# $t4 = pieceGrid + i * PIECE_COLS + j	
-	lw	$t4, 0($t4)			# $t4 = pieceGrid[i * PIECE_COLS + j]
+	lb	$t4, 0($t4)			# $t4 = pieceGrid[i * PIECE_COLS + j]
 	
 	li	$t3, '#'			# $t3 = '#'
 	bne	$t3, $t4, cptp_cols_loop_inc	#branch if pieceGrid[i * PIECE_COLS + j] != '#'
 	
 	move	$t3, $a1			# $t3 = pieceCoords
 	add	$t3, $t0, $t3			# $t3 = pieceCoords + k
-	sw	$t1, 0($t3)			# pieceCoords[k] = i
+	sb	$t1, 0($t3)			# pieceCoords[k] = i
 	addi	$t3, $t3, 1			# $t3 = pieceCoords + k + 1
-	sw	$t2, 0($t3)			# pieceCoords[k+1] = j
+	sb	$t2, 0($t3)			# pieceCoords[k+1] = j
 	addi	$t0, $t0, 2			# k += 2
 
 cptp_cols_loop_inc:
@@ -599,12 +599,19 @@ backtrack:
 	j	backtrack_e			#jump to end
 	
 skip_if_backtrack:
+	li	$t0, 0				# $t0: i = 0
 	
-	
-backtrack_loop_b:
+bt_outer_loop_b:
+	bge	$t0, $s5, bt_outer_loop_e		
+	add	$t1, $t0, $s3			# $t1 = chosen + i
+	lb	$t1, 0($t1)			# $t1 = chosen[i]
 
+bt_outer_loop_inc:
+	addi	$t0, $t0, 1			# i += 1
+	j	bt_outer_loop_b			#jump to the start of the loop
 
-backtrack_loop_e:
+bt_outer_loop_e:
+
 	move	$v0, $s0			# $v0 = result
 
 backtrack_e:

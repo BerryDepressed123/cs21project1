@@ -506,6 +506,66 @@ get_max_x_of_piece_e:
 	
 	jr	$ra				#return 
 
+convert_piece_to_pairs:
+	# $a0 = pieceGrid[20]
+	# $a1 = pieceCoords[8]
+	
+	#preamble
+	subu	$sp, $sp, 4			#make stack frame
+	sw	$ra, 0($sp)			#store $ra
+	#preamble
+
+	li	$t0, 0				# $t0: k = 0
+	li	$t1, 0				# $t1: i = 0
+
+cptp_rows_loop_b:
+	bge	$t1, 4, cptp_rows_loop_e	#branch to end if i >= 4
+	li	$t2, 0				# $t2: j = 0
+	
+cptp_cols_loop_b:
+	bge	$t2, 4, cptp_cols_loop_e	#branch to end if j >= 4
+
+	li	$t3, PIECE_COLS			# $t3 = PIECE_COLS
+	mult	$t1, $t3			#multiplying i by PIECE_COLS
+	mflo	$t3				# $t3 = i * PIECE_COLS
+	add	$t3, $t2, $t3			# $t3 = i * PIECE_COLS + j
+	
+	move	$t4, $a0			# $t4 = pieceGrid
+	add	$t4, $t3, $t4			# $t4 = pieceGrid + i * PIECE_COLS + j	
+	lw	$t4, 0($t4)			# $t4 = pieceGrid[i * PIECE_COLS + j]
+	
+	li	$t3, '#'			# $t3 = '#'
+	bne	$t3, $t4, cptp_cols_loop_inc	#branch if pieceGrid[i * PIECE_COLS + j] != '#'
+	
+	move	$t3, $a1			# $t3 = pieceCoords
+	add	$t3, $t0, $t3			# $t3 = pieceCoords + k
+	sw	$t1, 0($t3)			# pieceCoords[k] = i
+	addi	$t3, $t3, 1			# $t3 = pieceCoords + k + 1
+	sw	$t2, 0($t3)			# pieceCoords[k+1] = j
+	addi	$t0, $t0, 2			# k += 2
+
+cptp_cols_loop_inc:
+	addi	$t2, $t2, 1			# j += 1
+	j	cptp_cols_loop_b		#jump to the start of the loop
+
+cptp_cols_loop_e:
+	#marks the end of cptp_cols_loop
+	
+cptp_rows_loop_inc:
+	addi	$t1, $t1, 1			# i += 1
+	j	cptp_rows_loop_b		#jump to the start of the loop
+	
+cptp_rows_loop_e:
+	#marks the end of cptp_rows_loop
+
+convert_piece_to_pairs_e:
+	#end
+	lw	$ra, 0($sp)			#load values from respective stack frame
+	addu	$sp, $sp, 4			#deallocate stack frame
+	#end
+	
+	jr	$ra				#return
+
 
 .data
 yes:		.asciiz "YES\n"

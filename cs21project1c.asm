@@ -657,6 +657,7 @@ bt_inner_loop_b:
 	
 	jal	drop_piece_in_grid 		#call drop_piece_in_grid
 
+bt_outer_if:
 	#is $a3 still preserved?
 	lb	$t0, 0($a3)			# $t0: success
 	bne	$t0, 1, bt_inner_loop_inc	#branch if $t0 != 1
@@ -665,19 +666,30 @@ bt_inner_loop_b:
 	li	$t1, 1				# $t1 = 1
 	sb	$t1, 0($t0)			# chosenCopy[i] = 1
 	
+bt_inner_if:
+	move	$a0, $v0			# $a0: nextGrid
+	move	$a1, $s6			# $a1: chosenCopy
+	move	$a2, $s4			# $a2: pieces
+	move	$a3, $s5			# $a3: numPieces
+	
+	jal	backtrack			#call backtrack
+	bne	$v0, 1, bt_inner_loop_inc	#branch if backtrack result is not 1	
+	j	backtrack_e			#return 1, and jump to end	
+	
 bt_inner_loop_inc:
 	addi	$s1, $s1, 1			# offset += 1
 	j	bt_inner_loop_b			#jump to the start of the loop
 
 bt_inner_loop_e:
-
+	#marks the end of bt_inner_loop
 
 bt_outer_loop_inc:
 	addi	$s0, $s0, 1			# i += 1
 	j	bt_outer_loop_b			#jump to the start of the loop
 
 bt_outer_loop_e:
-
+	#marks the end of bt_outer_loop
+	
 	li	$v0, 0				# $v0 = result
 
 backtrack_e:

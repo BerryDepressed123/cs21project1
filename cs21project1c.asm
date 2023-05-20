@@ -573,23 +573,34 @@ backtrack:
 	# $a3 = numPieces 
 
 	#preamble
-	subu	$sp, $sp, 12			#make stack frame
-	sw	$ra, 8($sp)			#store $ra
-	sw	$s0, 4($sp)			#store $s0
-	sw	$s1, 0($sp)			#store $s1
+	subu	$sp, $sp, 28			#make stack frame
+	sw	$ra, 24($sp)			#store $ra
+	sw	$s0, 20($sp)			#store $s0
+	sw	$s1, 16($sp)			#store $s1
+	sw	$s2, 12($sp)			#store $s2
+	sw	$s3, 8($sp)			#store $s3
+	sw	$s4, 4($sp)			#store $s4
+	sw	$s5, 0($sp)			#store $s5
 	#preamble
 
 	li	$s0, 0				# $s0: result = 0
-	
+	move	$s2, $a0			# $s2 = currGrid[70]
+	move	$s3, $a1			# $s3 = chosen
+	move	$s4, $a2			# $s4 = pieces
+	move	$s5, $a3			# $s5 = numPieces
 
 backtrack_e:
 	move	$v0, $s0			# $v0 = result
 	
 	#end
-	lw	$ra, 8($sp)			#load values from respective stack frame
-	lw	$s0, 4($sp)			
-	lw	$s1, 0($sp)
-	addu	$sp, $sp, 12			#deallocate stack frame
+	lw	$ra, 24($sp)			#load values from respective stack frame
+	lw	$s0, 20($sp)			
+	lw	$s1, 16($sp)			
+	lw	$s2, 12($sp)			
+	lw	$s3, 8($sp)			
+	lw	$s4, 4($sp)			
+	lw	$s5, 0($sp)			
+	addu	$sp, $sp, 28			#deallocate stack frame
 	#end	
 
 	jr	$ra				#return

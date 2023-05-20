@@ -566,6 +566,33 @@ convert_piece_to_pairs_e:
 	
 	jr	$ra				#return
 
+backtrack:
+	# $a0 = currGrid[70]
+	# $a1 = chosen
+	# $a2 = pieces
+	# $a3 = numPieces 
+
+	#preamble
+	subu	$sp, $sp, 12			#make stack frame
+	sw	$ra, 8($sp)			#store $ra
+	sw	$s0, 4($sp)			#store $s0
+	sw	$s1, 0($sp)			#store $s1
+	#preamble
+
+	li	$s0, 0				# $s0: result = 0
+	
+
+backtrack_e:
+	move	$v0, $s0			# $v0 = result
+	
+	#end
+	lw	$ra, 8($sp)			#load values from respective stack frame
+	lw	$s0, 4($sp)			
+	lw	$s1, 0($sp)
+	addu	$sp, $sp, 12			#deallocate stack frame
+	#end	
+
+	jr	$ra				#return
 
 .data
 yes:		.asciiz "YES\n"

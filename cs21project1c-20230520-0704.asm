@@ -249,15 +249,15 @@ answer:
 	jal	backtrack			# call backtrack
 	
 	li	$t0, 1				# $t0 = 1
-	bne	$v0, $t0			#branch to print_no if result != 1
+	bne	$v0, $t0, print_no		#branch to print_no if result != 1
 	
-print_yes
+print_yes:
 	la	$a0, yes			#load yes (from .data) and print
 	li	$v0, 4				#preparing to print string
 	syscall
 	j	main_e				#jump to end
 	
-print_no
+print_no:
 	la	$a0, no				#load no (from .data) and print
 	li	$v0, 4				#preparing to print string
 	syscall
@@ -329,14 +329,14 @@ ieg_cols_loop_b:
 	mflo	$t2				# $t2 = i * GRID_COLS
 	add	$t2, $t1, $t2			# $t2 = i * GRID_COLS + j
 	add	$t2, $a0, $t2			# $t2 = gridOne + i * GRID_COLS + j
-	lw	$t2, 0($t2)			# $t2 = gridOne[i * GRID_COLS + j]
+	lb	$t2, 0($t2)			# $t2 = gridOne[i * GRID_COLS + j]
 	
 	li	$t3, GRID_COLS			# $t3 = GRID_COLS
 	mult	$t0, $t3			#multiplying i by GRID_COLS
 	mflo 	$t3				# $t3 = i * GRID_COLS
 	add	$t3, $t1, $t3			# $t3 = i * GRID_COLS + j
 	add	$t3, $a1, $t3			# $t3 = gridTwo + i * GRID_COLS + j
-	lw	$t3, 0($t3)			# $t3 = gridTwo[i * GRID_COLS + j]
+	lb	$t3, 0($t3)			# $t3 = gridTwo[i * GRID_COLS + j]
 	
 	beq	$t2, $t3, ieg_cols_loop_m	#branch if $t2 == $t3
 	andi	$s0, $s0, 0			# result = result AND 0 
@@ -435,7 +435,7 @@ fb_cols_loop_b:
 	mflo	$t2				# $t2 = i * GRID_COLS
 	add	$t2, $t1, $t2			# $t2 = i * GRID_COLS + j
 	add	$t2, $a0, $t2			# $t2 = grid + i * GRID_COLS + j
-	lw	$t3, 0($t2)			# $t3 = grid[i * GRID_COLS + j]
+	lb	$t3, 0($t2)			# $t3 = grid[i * GRID_COLS + j]
 
 	li	$t4, '#'			# $t4 = '#'
 	bne	$t3, $t4, fb_cols_loop_inc	#branch to loop increment
@@ -454,7 +454,6 @@ fb_rows_loop_m:
 fb_rows_loop_e:
 
 .data
-yes:		asciiz "YES\n"
-no:		asciiz "NO\n"
-newline: 	asciiz "\n"
-
+yes:		.asciiz "YES\n"
+no:		.asciiz "NO\n"
+newline: 	.asciiz "\n"

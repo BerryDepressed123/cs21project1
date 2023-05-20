@@ -251,13 +251,13 @@ answer:
 	li	$t0, 1				# $t0 = 1
 	bne	$v0, $t0			#branch to print_no if result != 1
 	
-print_yes
+print_yes:
 	la	$a0, yes			#load yes (from .data) and print
 	li	$v0, 4				#preparing to print string
 	syscall
 	j	main_e				#jump to end
 	
-print_no
+print_no:
 	la	$a0, no				#load no (from .data) and print
 	li	$v0, 4				#preparing to print string
 	syscall
@@ -468,7 +468,7 @@ fb_rows_loop_e:
 
 
 .data
-yes:		asciiz "YES\n"
-no:		asciiz "NO\n"
-newline: 	asciiz "\n"
+yes:		.asciiz "YES\n"
+no:		.asciiz "NO\n"
+newline: 	.asciiz "\n"
 

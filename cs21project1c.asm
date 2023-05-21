@@ -15,11 +15,12 @@ main:
 	syscall 
 	move	$s0, $v0			#set $s0 to be start_grid
 	
-	# Line 26
-	addi	$a0, $0, 70			#allocate 70 bytes
-	li	$v0, 9				#preparing for sbrk
-	syscall
-	move	$s1, $v0			#set $s1 to be final_grid
+	# # Line 26
+	# addi	$a0, $0, 70			#allocate 70 bytes
+	# li	$v0, 9				#preparing for sbrk
+	# syscall
+	# move	$s1, $v0			#set $s1 to be final_grid
+	la	$s1, final_grid
 	
 	# Line 27
 	addi	$a0, $0, 20			#allocate 20 bytes
@@ -590,7 +591,7 @@ backtrack:
 	move	$s4, $a2			# $s4 = pieces
 	move	$s5, $a3			# $s5 = numPieces
 
-	lw	$a1, 16($sp)			# $a1 = $s1 = final_grid?
+	la	$a1, final_grid			# $a1 = $s1 = final_grid?
 	jal	is_equal_grids			#call is_equal_grids(currGrid, final_grid)
 	move	$t0, $v0			# $t0: result of call
 	li	$t1, 1				# $t1 = 1
@@ -932,4 +933,4 @@ drop_piece_in_grid_e:
 yes:		.asciiz "YES\n"
 no:		.asciiz "NO\n"
 newline: 	.asciiz "\n"
-
+final_grid:	.space 70

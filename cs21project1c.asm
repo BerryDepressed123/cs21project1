@@ -766,8 +766,37 @@ dpig_1st_loop_b:
 	j	dpig_1st_loop_b			#jump to the start of the loop
 	
 dpig_1st_loop_e:
-	#marks the end of dpig_1st_loop
+	#marks the end of dpig_1st_loop			
 	
+dpig_while_b:
+	li	$t1, 1				# $t1: canStillGoDown
+	li	$t2, 0				# $t2: i = 0
+	
+dpig_while_outer_b:
+	bge	$t2, 10, dpig_while_outer_e	#branch if i >= 10
+	li	$t3, 0				# $t3: j = 0
+	
+dpig_while_inner_b:
+	bge	$t3, 6, dpig_while_inner_e	#branch if j >= 6
+	
+
+dpig_while_inner_m:
+
+
+
+dpig_while_inner_e:
+
+dpig_while_outer_inc:
+	addi	$t2, $t2, 1			# i += 1
+	j	dpig_while_outer_b		#jump to the start of the loop
+
+dpig_while_outer_e:
+
+dpig_while_m:
+	j	dpig_while_b			#jump to the start of while
+
+dpig_while_e:
+
 drop_piece_in_grid_e:
 	#end
 	lw	$ra, 20($sp)			#loading from respective stack frame

@@ -863,6 +863,43 @@ dpig_while_m:
 dpig_while_e:
 	#marks the end of dpig_while loop
 
+	li	$t1, 0				# $t1: i = 0
+
+dpig_outer_b:
+	bge	$t1, 10, dpig_outer_e		#branch if i >= 10
+	li	$t2, 0				# $t2: j = 0
+	
+dpig_inner_b:
+	bge	$t2, 6, dpig_inner_e		#branch if j >= 6
+
+	li	$t3, GRID_COLS			# $t3 = GRID_COLS
+	mult	$t1, $t3			#multiplying i by GRID_COLS
+	mflo	$t3				# $t3 = i * GRID_COLS
+	add	$t3, $t2, $t3			# $t3 = i * GRID_COLS + j
+	add	$t3, $t3, $s4			# $t3 = gridCopy + i * GRID_COLS + j
+	lb	$t3, 0($t3)			# $t3: gridCopy[i * GRID_COLS + j]
+	
+	li	$t4, '#'			# $t4 = '#'
+	bne	$t3, $t4, dpig_inner_inc	#continue if if not passed
+	
+dpig_inner_if:
+	bge	$t1, $t0, dpig_inner_inc	#continue if if not passed
+	move	$t0, $t1			# maxY = i
+
+dpig_inner_inc:
+	addi	$t2, $t2, 1			# j += 1
+	j	dpig_inner_b			#jump to the start of the loop
+
+dpig_inner_e:
+	#marks the end of dpig_inner loop
+
+dpig_outer_inc:
+	addi	$t1, $t1, 1			# i += 1
+	j	dpig_outer_b			#jump to the start of the loop
+
+dpig_outer_e:
+	#marks the end of dpig_outer loop
+
 drop_piece_in_grid_e:
 	#end
 	lw	$ra, 20($sp)			#loading from respective stack frame

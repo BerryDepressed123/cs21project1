@@ -741,6 +741,32 @@ drop_piece_in_grid:
 	jal	copy				#call copy
 	
 	li	$t0, 100			# $t0: maxY = 100
+	li	$t1, 0				# $t1: i = 0
+	
+dpig_1st_loop_b:
+	bge	$t1, 8, dpig_1st_loop_e		#branch to end if i >= 8
+	
+	add	$t2, $t1, $s1			# $t2 = piece + i
+	lb	$t3, 0($t2)			# $t3: piece[i]
+	li	$t4, GRID_COLS			# $t4 = GRID_COLS
+	mult	$t3, $t4			#multiplying piece[i] by GRID_COLS
+	mflo	$t3				# $t3: piece[i] * GRID_COLS
+	
+	addi	$t2, $t2, 1			# $t2 = piece + i + 1
+	lb	$t2, 0($t2)			# $t2: piece[i + 1]
+	
+	add	$t2, $t2, $t3			# $t2 = piece[i + 1] + piece[i] * GRID_COLS
+	add	$t2, $t2, $s2			# $t2 = piece[i + 1] + piece[i] * GRID_COLS + yOffset
+	
+	add	$t2, $t2, $s4			# $t2 = gridCopy + piece[i + 1] + piece[i] * GRID_COLS + yOffset
+	li	$t3, '#'			# $t3 = '#'
+	sb	$t3, 0($t2)			# gridCopy[piece[i + 1] + piece[i] * GRID_COLS + yOffset] = '#'
+	
+	addi	$t1, $t1, 2			# i += 2
+	j	dpig_1st_loop_b			#jump to the start of the loop
+	
+dpig_1st_loop_e:
+	#marks the end of dpig_1st_loop
 	
 drop_piece_in_grid_e:
 	#end

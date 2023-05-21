@@ -8,7 +8,7 @@
 
 .text
 
-main_b:
+main:
 	# Line 25
 	addi	$a0, $0, 70			#allocate 70 bytes
 	li	$v0, 9				#preparing for sbrk
@@ -78,7 +78,7 @@ fill_rows_m:
 	add	$t2, $t2, $s1			#add offset and address of final_grid
 	
 	li 	$t3, '\0'			#load "\0" to $t3
-	sh	$t3, 0($t2)			#set final_grid[(GRID_COLS * row) + 6] = '\0'
+	sb	$t3, 0($t2)			#set final_grid[(GRID_COLS * row) + 6] = '\0'
 	
 	addi	$t0, $t0, 1			#increment row by 1
 	j	fill_rows_b			#jump to the start of the loop
@@ -249,7 +249,7 @@ answer:
 	jal	backtrack			# call backtrack
 	
 	li	$t0, 1				# $t0 = 1
-	bne	$v0, $t0			#branch to print_no if result != 1
+	bne	$v0, $t0, print_no		#branch to print_no if result != 1
 	
 print_yes:
 	la	$a0, yes			#load yes (from .data) and print

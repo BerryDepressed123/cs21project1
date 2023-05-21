@@ -794,7 +794,7 @@ dpig_while_inner_b:
 dpig_while_inner_if:
 	beq	$t2, 9, update_csgd		#branch if or statement passed
 
-	add	$t5, $s4, $t5			# $t5 = gridCopy + i * GRID_COLS + j + GRID_COLS
+	addi	$t5, $t5, GRID_COLS			# $t5 = gridCopy + i * GRID_COLS + j + GRID_COLS
 	lb	$t5, 0($t5)			# $t5 = gridCopy[i * GRID_COLS + j + GRID_COLS]
 	
 	li	$t6, 'X'			# $t6 = 'X'

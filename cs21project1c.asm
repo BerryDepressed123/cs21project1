@@ -10,7 +10,7 @@
 
 main:
 	# Line 25
-	addi	$a0, $0, 71			#allocate 70 bytes
+	addi	$a0, $0, 71			#allocate 71 bytes
 	li	$v0, 9				#preparing for sbrk
 	syscall 
 	move	$s0, $v0			#set $s0 to be start_grid
@@ -235,8 +235,6 @@ print_no:
 	syscall
 
 main_e:
-	la	$a0, final_grid
-	jal	print_grid
 	# exit syscall
 	li	$v0, 10
 	syscall
@@ -278,8 +276,8 @@ copy_e:
 	jr	$ra 				#return
 
 is_equal_grids:
-	# $a0 = gridOne[70]
-	# $a1 = gridTwo[70]
+	# $a0 = gridOne[71]
+	# $a1 = gridTwo[71]
 	
 	#preamble
 	subu	$sp, $sp, 8			#make stack frame
@@ -344,21 +342,8 @@ is_equal_grids_e:
 	
 	jr	$ra				#return 
 
-print_grid:
-	# $a0 = grid[70]
-	#preamble
-	subu	$sp, $sp, 4			#make stack frame
-	sw	$ra, 0($sp)			#store $ra
-	li	$v0, 4				#preparing string print 
-	syscall
-	#end
-	lw	$ra, 0($sp)			#load values from respective stack frame
-	addu	$sp, $sp, 8			#deallocate stack frame	
-	#end
-	jr	$ra				#return 
-
 freeze_blocks:
-	# $a0 = grid[70]
+	# $a0 = grid[71]
 	
 	#preamble
 	subu	$sp, $sp, 4			#make stack frame
@@ -512,7 +497,7 @@ convert_piece_to_pairs_e:
 	jr	$ra				#return
 
 backtrack:
-	# $a0 = currGrid[70]
+	# $a0 = currGrid[71]
 	# $a1 = chosen
 	# $a2 = pieces
 	# $a3 = numPieces 
@@ -530,7 +515,7 @@ backtrack:
 	sw	$s7, 0($sp)			#store $s7
 	#preamble
 
-	move	$s2, $a0			# $s2 = currGrid[70]
+	move	$s2, $a0			# $s2 = currGrid[71]
 	move	$s3, $a1			# $s3 = chosen
 	move	$s4, $a2			# $s4 = pieces
 	move	$s5, $a3			# $s5 = numPieces
@@ -654,7 +639,7 @@ backtrack_e:
 	jr	$ra				#return
 
 drop_piece_in_grid:
-	# $a0 = grid[70]
+	# $a0 = grid[71]
 	# $a1 = piece[8]
 	# $a2 = yOffset
 	# $a3 = isSuccess
@@ -674,14 +659,14 @@ drop_piece_in_grid:
 	move	$s2, $a2			# $s2: yOffset
 	move	$s3, $a3			# $s3: isSuccess
 	
-	li	$a0, 70				#allocate 70 bytes
+	li	$a0, 71				#allocate 71 bytes
 	li	$v0, 9				#preparing for sbrk
 	syscall
 	move	$s4, $v0			# $s4: gridCopy
 	
 	move	$a0, $s0			# $a0 = grid
 	move	$a1, $s4			# $a1 = gridCopy
-	li	$a2, 70				# $a2 = 70
+	li	$a2, 71				# $a2 = 71
 	
 	jal	copy				#call copy
 	

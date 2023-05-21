@@ -779,10 +779,36 @@ dpig_while_outer_b:
 dpig_while_inner_b:
 	bge	$t3, 6, dpig_while_inner_e	#branch if j >= 6
 	
+	li	$t4, GRID_COLS			# $t4 = GRID_COLS
+	mult	$t2, $t4			#multiplying i by GRID_COLS
+	mflo	$t5				# $t5 = i * GRID_COLS
+	add	$t5, $t3, $t5			# $t5 = i * GRID_COLS + j
+	add	$t5, $t5, $s4			# $t5 = gridCopy + i * GRID_COLS + j
+	lb	$t5, 0($t5)			# $t5 = gridCopy[i * GRID_COLS + j]
+	li	$t6, '#'			# $t6 = '#'
 
-dpig_while_inner_m:
+	beq	$t5, $t6, dpigwi_if		#branch if gridCopy[i * GRID_COLS + j] = '#'
+	j	dpig_while_inner_inc		#continue for loop
 
+dpigwi_if:
+	beq	$t2, 9, update_csgd		#branch if or statement passed
 
+	addi	$t5, $t2, 1			# $t5 = i + 1
+	mult	$t4, $t5			#multiplying (i + 1) by GRID_COLS
+	mflo	$t5				# $t5 = (i + 1) * GRID_COLS
+	add	$t5, $t3, $t5			# $t5 = (i + 1) * GRID_COLS + j
+	add	$t5, $s4, $t5			# $t5 = gridCopy + (i + 1) * GRID_COLS + j
+	lb	$t5, 0($t5)			# $t5 = gridCopy[(i + 1) * GRID_COLS + j]
+	
+	li	$t6, 'X'			# $t6 = 'X'
+	bne	$t5, $t6, dpig_while_inner_inc	#continue if gridCopy[(i + 1) * GRID_COLS + j] != 'X'
+						
+update_csgd:
+	li	$t1, 0				# $t1: canStillGoDown = 0
+
+dpig_while_inner_inc:
+	addi	$t3, $t3, 1			# j += 1
+	j	dpig_while_inner_b		#jump to the start of the loop
 
 dpig_while_inner_e:
 

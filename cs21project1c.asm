@@ -170,18 +170,18 @@ malloc_pieces:
 	syscall					
 	move	$s5, $v0			# $s5: converted_pieces
 	
-	addi	$t0, $0, 0			# $t0: i
+	addi	$s6, $0, 0			# $s6: i
 	
 convert_pieces_b:
-	bge	$t0, $s3, convert_pieces_e	#branch to end if i >= numPieces
+	bge	$s6, $s3, convert_pieces_e	#branch to end if i >= numPieces
 	
-	addi	$t1, $0, 0			# $t1: row
+	addi	$s7, $0, 0			# $s7: row
 
 convert_row_b:
-	bge	$t1, 4, convert_row_e		#branch to end if row >= 4
+	bge	$s7, 4, convert_row_e		#branch to end if row >= 4
 	
 	addi	$a1, $0, PIECE_COLS		# $a1 = PIECE_COLS
-	mult	$t1, $a1 			#multiplying row with PIECE_COLS
+	mult	$s7, $a1 			#multiplying row with PIECE_COLS
 	mflo	$a0				# $a0: row * PIECE_COLS
 	add	$a0, $a0, $s2			# $a0: pieceAscii + row * PIECE_COLS
 	
@@ -192,7 +192,7 @@ convert_row_b:
 	# li	$v0, 12				#preparing for character read
 	# syscall
 	
-	addi	$t1, $t1, 1			# row += 1
+	addi	$s7, $s7, 1			# row += 1
 	j	convert_row_b			#jump to the start of the loop
 
 convert_row_e:
@@ -202,13 +202,13 @@ convert_pieces_m:
 	move	$a0, $s2			# $a2 = pieceAscii
 	
 	li	$a1, 8				# $a1 = 8
-	mult 	$t0, $a1			#multiplying i by 8
+	mult 	$s6, $a1			#multiplying i by 8
 	mflo	$a1				# $a1 = i * 8
 	add	$a1, $a1, $s5			# $a1 = converted_pieces + i * 8
 	
 	jal	convert_piece_to_pairs		#call convert_piece_to_pairs
 
-	addi	$t0, $t0, 1			# i += 1
+	addi	$s6, $s6, 1			# i += 1
 	j	convert_pieces_b		#jump to the start of the loop
 
 convert_pieces_e:
@@ -716,7 +716,7 @@ dpig_while_inner_b:
 	add	$t5, $t3, $t5			# $t5 = i * GRID_COLS + j
 	add	$t5, $t5, $s4			# $t5 = gridCopy + i * GRID_COLS + j
 	lb	$t6, 0($t5)			# $t6 = gridCopy[i * GRID_COLS + j]
-	li	$t7, '#'			# $t6 = '#'
+	li	$t7, '#'			# $t7 = '#'
 
 	beq	$t6, $t7, dpig_while_inner_if	#branch if gridCopy[i * GRID_COLS + j] = '#'
 	j	dpig_while_inner_inc		#continue for loop
@@ -724,7 +724,7 @@ dpig_while_inner_b:
 dpig_while_inner_if:
 	beq	$t2, 9, update_csgd		#branch if or statement passed
 
-	addi	$t5, $t5, GRID_COLS			# $t5 = gridCopy + i * GRID_COLS + j + GRID_COLS
+	addi	$t5, $t5, GRID_COLS		# $t5 = gridCopy + i * GRID_COLS + j + GRID_COLS
 	lb	$t5, 0($t5)			# $t5 = gridCopy[i * GRID_COLS + j + GRID_COLS]
 	
 	li	$t6, 'X'			# $t6 = 'X'

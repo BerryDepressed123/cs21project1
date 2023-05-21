@@ -10,7 +10,7 @@
 
 main:
 	# Line 25
-	addi	$a0, $0, 70			#allocate 70 bytes
+	addi	$a0, $0, 71			#allocate 70 bytes
 	li	$v0, 9				#preparing for sbrk
 	syscall 
 	move	$s0, $v0			#set $s0 to be start_grid
@@ -19,7 +19,7 @@ main:
 	la	$s1, final_grid			# $s1 = final_grid
 	
 	# Line 27
-	addi	$a0, $0, 20			#allocate 20 bytes
+	addi	$a0, $0, 21			#allocate 20 bytes
 	li	$v0, 9				#preparing for sbrk
 	syscall
 	move	$s2, $v0			#set $s2 to be pieceAscii
@@ -49,12 +49,12 @@ fill_cols_e:
 	#marks the end of the fill_cols loop
 
 fill_rows_m:
-	li	$t3, '\0'
+	li	$t3, '\n'
 	addi	$t2, $t4, 6			# t2 = row * GRID_COLS + 6
 	add	$t5, $t2, $s0			# t5 = start_grid + row * GRID_COLS + 6
-	sb	$t3, 0($t5)			# start_grid[row * GRID_COLS + 6] = '\0'
+	sb	$t3, 0($t5)			# start_grid[row * GRID_COLS + 6] = '\n'
 	add	$t5, $t2, $s1			# t5 = final_grid + row * GRID_COLS + 6
-	sb	$t3, 0($t5)			# final_grid[row * GRID_COLS + 6] = '\0'
+	sb	$t3, 0($t5)			# final_grid[row * GRID_COLS + 6] = '\n'
 
 	addi	$t0, $t0, 1			# increment row by 1
 	addi	$t4, $t4, GRID_COLS		# increment temp by 7
@@ -73,11 +73,12 @@ read_start_input_b:
 	mflo	$t1				# $t1 = GRID_COLS * row
 	add	$a0, $t1, $s0			# $a0 = start_grid + GRID_COLS * row
 	
+	addi	$a1, $a1, 1
 	li	$v0, 8				#preparing for string read 
 	syscall					
 	
-	li	$v0, 12				#preparing for character read
-	syscall
+	# li	$v0, 12				#preparing for character read
+	# syscall
 	
 	addi	$t0, $t0, 1			#row += 1
 	j	read_start_input_b		#jump to the start of the loop
@@ -95,11 +96,12 @@ read_final_input_b:
 	mflo	$t1				# $t1 = GRID_COLS * row
 	add	$a0, $t1, $s1			# $a0 = final_grid + GRID_COLS * row
 	
+	addi	$a1, $a1, 1
 	li	$v0, 8				#preparing for string read 
 	syscall					
 	
-	li	$v0, 12				#preparing for character read
-	syscall
+	# li	$v0, 12				#preparing for character read
+	# syscall
 	
 	addi	$t0, $t0, 1			#row += 1
 	j	read_final_input_b		#jump to the start of the loop
@@ -182,11 +184,12 @@ convert_row_b:
 	mflo	$a0				# $a0: row * PIECE_COLS
 	add	$a0, $a0, $s2			# $a0: pieceAscii + row * PIECE_COLS
 	
+	addi	$a1, $a1, 1
 	li	$v0, 8				#preparing for string read
 	syscall
 	
-	li	$v0, 12				#preparing for character read
-	syscall
+	# li	$v0, 12				#preparing for character read
+	# syscall
 	
 	addi	$t1, $t1, 1			# row += 1
 	j	convert_row_b			#jump to the start of the loop
@@ -232,6 +235,8 @@ print_no:
 	syscall
 
 main_e:
+	la	$a0, final_grid
+	jal	print_grid
 	# exit syscall
 	li	$v0, 10
 	syscall
@@ -341,44 +346,15 @@ is_equal_grids_e:
 
 print_grid:
 	# $a0 = grid[70]
-	
 	#preamble
-	subu	$sp, $sp, 8			#make stack frame
-	sw	$ra, 4($sp)			#store $ra
-	sw	$s0, 0($sp)			#store $s0
-	#preamble
-	
-	move	$s0, $a0			# $s0 = grid[70]
-	li	$t0, 0				# $t0: i = 0
-
-print_grid_loop_b:
-	bge	$t0, 10, print_grid_loop_e	#branch to end if i >= 10
-	
-	li	$t1, GRID_COLS			# $t1 = GRID_COLS
-	mult	$t0, $t1			#multiplying i by GRID_COLS
-	mflo 	$a0				# $a0 = i * GRID_COLS
-	add	$a0, $s0, $a0			# $a0 = grid + i * GRID_COLS	
-	
+	subu	$sp, $sp, 4			#make stack frame
+	sw	$ra, 0($sp)			#store $ra
 	li	$v0, 4				#preparing string print 
 	syscall
-	
-	la	$a0, newline			# $a0 = "\n"
-	li	$v0, 4				#preparing string print
-	syscall	 
-	
-	addi	$t0, $t0, 1			# i += 1
-	j	print_grid_loop_b		#jump to the start of the loop
-	
-print_grid_loop_e:
-	#marks the end of print_grid_loop
-
-print_grid_e:
 	#end
-	lw	$ra, 4($sp)			#load values from respective stack frame
-	lw	$s0, 0($sp)		
+	lw	$ra, 0($sp)			#load values from respective stack frame
 	addu	$sp, $sp, 8			#deallocate stack frame	
 	#end
-	
 	jr	$ra				#return 
 
 freeze_blocks:
@@ -901,4 +877,4 @@ drop_piece_in_grid_e:
 yes:		.asciiz "YES\n"
 no:		.asciiz "NO\n"
 newline: 	.asciiz "\n"
-final_grid:	.space 70
+final_grid:	.space 71

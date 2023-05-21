@@ -900,6 +900,20 @@ dpig_outer_inc:
 dpig_outer_e:
 	#marks the end of dpig_outer loop
 
+dpig_if:
+	bgt	$t0, 3, dpig_else		#branch if maxY > 3
+	li	$t0, 0				# $t0 = 0
+	sb	$t0, 0($s3)			# *isSuccess = 0
+	move	$v0, $s0			# return grid
+	j	drop_piece_in_grid_e		#jump to end
+
+dpig_else:
+	li	$t0, 1				# $t0 = 1
+	sb	$t0, 0($s3)			# *isSuccess = 1
+	move	$a0, $s4			# $a0 = gridCopy
+	jal	freeze_blocks			#call freeze_blocks
+	j	drop_piece_in_grid_e		#jump to end
+
 drop_piece_in_grid_e:
 	#end
 	lw	$ra, 20($sp)			#loading from respective stack frame

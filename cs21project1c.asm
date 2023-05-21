@@ -1,4 +1,4 @@
-# CS21 MP1 -- S2 AY 2022 - 2023
+# CS21 Lab 1 -- S2 AY 2022 - 2023
 # Timothy Javier -- 05/19/2023
 # cs21project1c.asm -- assembly code for the project
 

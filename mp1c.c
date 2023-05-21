@@ -27,13 +27,15 @@ int main() {
     char pieceAscii[20];
 
     // Fill up the first four rows with dots
-    for(int row = 0; row < 4; row++) {
+    
+    // temp = row * GRID_COLS
+    for(int temp = 0, row = 0; row < 4; row++, temp += GRID_COLS) {
         for(int col = 0; col < 6; col++) {
-            start_grid[(GRID_COLS * row) + col] = '.';
-            final_grid[(GRID_COLS * row) + col] = '.';
+            start_grid[temp + col] = '.';
+            final_grid[temp + col] = '.';
         }
-        start_grid[(GRID_COLS * row) + 6] = 0;
-        final_grid[(GRID_COLS * row) + 6] = '\0';
+        start_grid[temp + 6] = '\0';
+        final_grid[temp + 6] = '\0';
     }
 
     // Read 6 character inputs for the next 6 rows
@@ -56,13 +58,13 @@ int main() {
     }
 
 
-    for(int row = 4; row < 10; row++) {
+    for(int row = 4, temp = GRID_COLS * 4; row < 10; row++, temp += GRID_COLS) {
         for(int col = 0; col < 6; col++) {
-            if(start_grid[(GRID_COLS * row) + col] == '#') {
-                start_grid[(GRID_COLS * row) + col] = 'X';
+            if(start_grid[temp + col] == '#') {
+                start_grid[temp + col] = 'X';  
             }
-            if(final_grid[(GRID_COLS * row) + col] == '#') {
-                final_grid[(GRID_COLS * row) + col] = 'X';
+            if(final_grid[temp + col] == '#') {
+                final_grid[temp + col] = 'X';
             }
         }
     }
@@ -121,10 +123,7 @@ char is_equal_grids(char gridOne[70], char gridTwo[70]) {
 
 void print_grid(char grid[70]) {
     for(int i = 0; i < 10; i++) {
-        for(int j = 0; j < GRID_COLS; j++) {
-            printf("%d ", grid[(i * GRID_COLS) + j]);
-        }
-        // printf(grid + i * GRID_COLS);
+        printf(grid + i * GRID_COLS);
         putchar('\n');
     }
 }
@@ -223,7 +222,6 @@ void convert_piece_to_pairs(char pieceGrid[20], char pieceCoords[8]) {
 char backtrack(char currGrid[70], char* chosen, char* pieces, int numPieces) {
     // printf("\nCURR_GRID\n");
     // print_grid(currGrid);
-    char result = 0;
     char success;
 
     if(is_equal_grids(currGrid, final_grid)) {
@@ -243,14 +241,12 @@ char backtrack(char currGrid[70], char* chosen, char* pieces, int numPieces) {
             char* nextGrid = drop_piece_in_grid(currGrid, pieces + 8 * i, offset, &success);
             if(success == 1) {
                 chosenCopy[i] = 1;
-                result |= backtrack(nextGrid, chosenCopy, pieces, numPieces);
-                if(result) {
-                    // free(chosenCopy);
+                if(backtrack(nextGrid, chosenCopy, pieces, numPieces) == 1) {
                     return 1;
                 }
             }
         }
     }
     // free(chosenCopy);
-    return result;
+    return 0;
 }

@@ -15,12 +15,8 @@ main:
 	syscall 
 	move	$s0, $v0			#set $s0 to be start_grid
 	
-	# # Line 26
-	# addi	$a0, $0, 70			#allocate 70 bytes
-	# li	$v0, 9				#preparing for sbrk
-	# syscall
-	# move	$s1, $v0			#set $s1 to be final_grid
-	la	$s1, final_grid
+	# Line 26
+	la	$s1, final_grid			# $s1 = final_grid
 	
 	# Line 27
 	addi	$a0, $0, 20			#allocate 20 bytes
@@ -29,6 +25,7 @@ main:
 	move	$s2, $v0			#set $s2 to be pieceAscii
 
 	addi	$t0, $0, 0			# $t0: row = 0
+	addi	$t4, $0, 0			# $t4 = temp = row * GRID_COLS
 			
 fill_rows_b:
 	bge	$t0, 4, fill_rows_e		# branch to end if row >= 4
@@ -38,24 +35,13 @@ fill_rows_b:
 fill_cols_b:
 	bge	$t1, 6, fill_cols_e		#branch to end if col >= 6
 	
-	addi	$t2, $0, GRID_COLS		# $t2 = GRID_COLS
-	mult	$t0, $t2			# multiplying row with GRID_COLS
-	mflo	$t2				# $t2 = GRID_COLS * row
-	add	$t2, $t2, $t1			# $t2 = (GRID_COLS * row) + col
-	add	$t2, $t2, $s0			# $t2 = start_grid + (GRID_COLS * row) + col
-	
-	li	$t3, '.'			# load '.' to $t3
-	sb	$t3, 0($t2)			# start_grid[(GRID_COLS * row) + col] = '.'
-	
-	addi	$t2, $0, GRID_COLS		#setting $t2 to GRID_COLS
-	mult	$t0, $t2			#multiplying row with GRID_COLS
-	mflo	$t2				#get product of row and GRID_COLS
-	add	$t2, $t2, $t1			#add the product by col
-	add	$t2, $t2, $s1			#add offset and address of final_grid
-	
-	li	$t3, '.'			#load '.' to $t3
-	sb	$t3, 0($t2)			#set final_grid[(GRID_COLS * row) + col] = '.'
-		
+	li	$t3, '.'			# $t3 = '.'
+	add	$t2, $t4, $t1			# $t2 = (GRID_COLS * row) + col
+	add	$t5, $t2, $s0			# $t5 = start_grid + (GRID_COLS * row) + col
+	sb	$t3, 0($t5)			# start_grid[(GRID_COLS * row) + col] = '.'
+	add	$t5, $t2, $s1			# $t5 = final_grid + (GRID_COLS * row) + col
+	sb	$t3, 0($t5)			# final_grid[(GRID_COLS * row) + col] = '.'
+
 	addi	$t1, $t1, 1			#increment col by 1
 	j	fill_cols_b			#jump to the start of the loop
 	
@@ -63,26 +49,16 @@ fill_cols_e:
 	#marks the end of the fill_cols loop
 
 fill_rows_m:
-	addi	$t2, $0, GRID_COLS		#setting $t2 to GRID_COLS
-	mult	$t0, $t2			#multiplying row with GRID_COLS
-	mflo	$t2				#get product of row and GRID_COLS
-	addi	$t2, $t2, 6			#add the product by 6
-	add	$t2, $t2, $s0			#add offset and address of start_grid
-	
-	li	$t3, '\0'			#set $t3 to 0
-	sb	$t3, 0($t2)			#set start_grid[(GRID_COLS * row) + 6] = 0
-	
-	addi	$t2, $0, GRID_COLS		#setting $t2 to GRID_COLS
-	mult	$t0, $t2			#multiplying row with GRID_COLS
-	mflo	$t2				#get product of row and GRID_COLS
-	addi	$t2, $t2, 6			#add the product by 6
-	add	$t2, $t2, $s1			#add offset and address of final_grid
-	
-	li 	$t3, '\0'			#load "\0" to $t3
-	sb	$t3, 0($t2)			#set final_grid[(GRID_COLS * row) + 6] = '\0'
-	
-	addi	$t0, $t0, 1			#increment row by 1
-	j	fill_rows_b			#jump to the start of the loop
+	li	$t3, '\0'
+	addi	$t2, $t4, 6			# t2 = row * GRID_COLS + 6
+	add	$t5, $t2, $s0			# t5 = start_grid + row * GRID_COLS + 6
+	sb	$t3, 0($t5)			# start_grid[row * GRID_COLS + 6] = '\0'
+	add	$t5, $t2, $s1			# t5 = final_grid + row * GRID_COLS + 6
+	sb	$t3, 0($t5)			# final_grid[row * GRID_COLS + 6] = '\0'
+
+	addi	$t0, $t0, 1			# increment row by 1
+	addi	$t4, $t4, GRID_COLS		# increment temp by 7
+	j	fill_rows_b			# jump to the start of the loop
 
 fill_rows_e:
 	#marks the end of fill_rows loop
@@ -131,42 +107,33 @@ read_final_input_b:
 read_final_input_e:
 	#marks the end of the read_final_input loop
 	
-	addi	$t0, $0, 4			# $t0: row = 4			
+	addi	$t0, $0, 4			# $t0: row = 4
+	addi	$t5, $0, 28			# $t5 = GRID_COLS * row
 
 cross_row_b:
 	bge	$t0, 10, cross_row_e		#branch to end if row >= 10
-	
 	addi	$t1, $0, 0			# $t1: col = 0
 
 cross_col_b:
 	bge	$t1, 6, cross_col_e		#branch to end if col >= 6
-	
-	addi	$t2, $0, GRID_COLS		# $t2 = GRID_COLS
-	mult 	$t0, $t2			#multiplying row with GRID_COLS
-	mflo	$t2				# $t2 = GRID_COLS * row
-	add	$t2, $t1, $t2			# $t2 = GRID_COLS * row + col
-	add	$t2, $s0, $t2			# $t2 = start_grid + GRID_COLS * row + col
-	
-	lb	$t4, 0($t2)			# $t4 = start_grid[GRID_COLS * row + col]
+
 	li	$t3, '#'			# $t3 = '#'
+	li	$t6, 'X'			# $t6 = 'X'
+
+	add	$t2, $t5, $t1			# $t2 = GRID_COLS * row + col
+	add	$t2, $t2, $s0			# $t2 = start_grid + GRID_COLS * row + col
+	lb	$t4, 0($t2)			# $t4 = start_grid[GRID_COLS * row + col]
+
 	bne	$t3, $t4, cross_col_b_final	# branch if start_grid[GRID_COLS * row + col] not == '#'
-	
-	li	$t3, 'X'			# $t3 = 'X'
-	sb	$t3, 0($t2)			# start_grid[GRID_COLS * row + col] = 'X'
+	sb	$t6, 0($t2)			# start_grid[GRID_COLS * row + col] = 'X'
 	
 cross_col_b_final:
-	addi	$t2, $0, GRID_COLS		# $t2 = GRID_COLS
-	mult 	$t0, $t2			#multiplying row with GRID_COLS
-	mflo	$t2				# $t2 = GRID_COLS * row
-	add	$t2, $t1, $t2			# $t2 = GRID_COLS * row + col
+	add	$t2, $t5, $t1			# $t2 = GRID_COLS * row + col
 	add	$t2, $s1, $t2			# $t2 = final_grid + GRID_COLS * row + col
-	
 	lb	$t4, 0($t2)			# $t2 = final_grid[GRID_COLS * row + col]
-	li	$t3, '#'			# $t3 = '#'
+
 	bne	$t3, $t4, cross_col_b_inc	# branch if final_grid[GRID_COLS * row + col] not == '#'
-	
-	li	$t3, 'X'			# $t3 = 'X'
-	sb	$t3, 0($t2)			# final_grid[GRID_COLS * row + col] = 'X'
+	sb	$t6, 0($t2)			# final_grid[GRID_COLS * row + col] = 'X'
 
 cross_col_b_inc:
 	addi	$t1, $t1, 1			# col += 1
@@ -177,6 +144,7 @@ cross_col_e:
 
 cross_row_m:
 	addi	$t0, $t0, 1			# row += 1
+	addi	$t5, $t5, GRID_COLS		# temp += GRID_COLS
 
 cross_row_e:
 	#marks the end of the cross_row loop

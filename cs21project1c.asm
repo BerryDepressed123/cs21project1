@@ -9,16 +9,13 @@
 .text
 
 main:
-	# Line 25
 	addi	$a0, $0, 71			#allocate 71 bytes
 	li	$v0, 9				#preparing for sbrk
 	syscall 
 	move	$s0, $v0			#set $s0 to be start_grid
 	
-	# Line 26
 	la	$s1, final_grid			# $s1 = final_grid
 	
-	# Line 27
 	addi	$a0, $0, 21			#allocate 20 bytes
 	li	$v0, 9				#preparing for sbrk
 	syscall
@@ -67,20 +64,17 @@ fill_rows_e:
 	
 read_start_input_b:
 	bge	$t0, 10, read_start_input_e	#branch to end if row >= 10
-	
+
 	addi	$a1, $0, GRID_COLS		# $a1 = GRID_COLS
 	mult	$t0, $a1			#multiplying row with GRID_COLS
 	mflo	$t1				# $t1 = GRID_COLS * row
 	add	$a0, $t1, $s0			# $a0 = start_grid + GRID_COLS * row
-	
+
 	addi	$a1, $a1, 1
 	li	$v0, 8				#preparing for string read 
-	syscall					
-	
-	# li	$v0, 12				#preparing for character read
-	# syscall
-	
-	addi	$t0, $t0, 1			#row += 1
+	syscall		
+
+	addi	$t0, $t0,1			#row += 1
 	j	read_start_input_b		#jump to the start of the loop
 
 read_start_input_e:
@@ -99,9 +93,6 @@ read_final_input_b:
 	addi	$a1, $a1, 1
 	li	$v0, 8				#preparing for string read 
 	syscall					
-	
-	# li	$v0, 12				#preparing for character read
-	# syscall
 	
 	addi	$t0, $t0, 1			#row += 1
 	j	read_final_input_b		#jump to the start of the loop

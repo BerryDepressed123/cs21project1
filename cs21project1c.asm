@@ -147,6 +147,7 @@ cross_col_e:
 cross_row_m:
 	addi	$t0, $t0, 1			# row += 1
 	addi	$t5, $t5, GRID_COLS		# temp += GRID_COLS
+	j 	cross_row_b
 
 cross_row_e:
 	#marks the end of the cross_row loop

@@ -787,10 +787,10 @@ dpig_while_inner_b:
 	lb	$t5, 0($t5)			# $t5 = gridCopy[i * GRID_COLS + j]
 	li	$t6, '#'			# $t6 = '#'
 
-	beq	$t5, $t6, dpigwi_if		#branch if gridCopy[i * GRID_COLS + j] = '#'
+	beq	$t5, $t6, dpig_while_inner_if	#branch if gridCopy[i * GRID_COLS + j] = '#'
 	j	dpig_while_inner_inc		#continue for loop
 
-dpigwi_if:
+dpig_while_inner_if:
 	beq	$t2, 9, update_csgd		#branch if or statement passed
 
 	addi	$t5, $t2, 1			# $t5 = i + 1
@@ -811,17 +811,46 @@ dpig_while_inner_inc:
 	j	dpig_while_inner_b		#jump to the start of the loop
 
 dpig_while_inner_e:
-
+	#marks the end of dpig_while_inner loop
+	
 dpig_while_outer_inc:
 	addi	$t2, $t2, 1			# i += 1
 	j	dpig_while_outer_b		#jump to the start of the loop
 
 dpig_while_outer_e:
+	#marks the end of dpig_while_outer loop
 
+dpig_while_if:
+	bne	$t1, 1, dpig_while_e		#break while loop if csgd != 1
+	li	$t2, 8				# $t2: i = 8
+	
+dpig_while_if_outer_b:
+	ble	$t2, -1, dpig_while_if_outer_e	#branch if i <= -1
+	li	$t3, 0				# $t3: j = 0
+
+dpig_while_if_inner_b:
+	bge	$t3, 6, dpig_while_if_inner_e	#branch if j >= 6
+	
+
+dpig_while_if_inner_inc:
+	addi	$t3, $t3, 1			# i += 1
+	j	dpig_while_if_inner_b		#jump to the start of the loop
+
+dpig_while_if_inner_e:
+	#marks the end of dpig_while_if_inner loop
+
+dpig_while_if_outer_dec:
+	subi	$t2, $t2, 1			# i -= 1
+	j	dpig_while_if_outer_b		#jump to the start of the loop
+
+dpig_while_if_outer_e:
+	#marks the end of dpig_while_if_outer loop
+	
 dpig_while_m:
 	j	dpig_while_b			#jump to the start of while
 
 dpig_while_e:
+	#marks the end of dpig_while loop
 
 drop_piece_in_grid_e:
 	#end

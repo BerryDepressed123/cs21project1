@@ -784,24 +784,20 @@ dpig_while_inner_b:
 	mflo	$t5				# $t5 = i * GRID_COLS
 	add	$t5, $t3, $t5			# $t5 = i * GRID_COLS + j
 	add	$t5, $t5, $s4			# $t5 = gridCopy + i * GRID_COLS + j
-	lb	$t5, 0($t5)			# $t5 = gridCopy[i * GRID_COLS + j]
-	li	$t6, '#'			# $t6 = '#'
+	lb	$t6, 0($t5)			# $t6 = gridCopy[i * GRID_COLS + j]
+	li	$t7, '#'			# $t6 = '#'
 
-	beq	$t5, $t6, dpig_while_inner_if	#branch if gridCopy[i * GRID_COLS + j] = '#'
+	beq	$t6, $t7, dpig_while_inner_if	#branch if gridCopy[i * GRID_COLS + j] = '#'
 	j	dpig_while_inner_inc		#continue for loop
 
 dpig_while_inner_if:
 	beq	$t2, 9, update_csgd		#branch if or statement passed
 
-	addi	$t5, $t2, 1			# $t5 = i + 1
-	mult	$t4, $t5			#multiplying (i + 1) by GRID_COLS
-	mflo	$t5				# $t5 = (i + 1) * GRID_COLS
-	add	$t5, $t3, $t5			# $t5 = (i + 1) * GRID_COLS + j
-	add	$t5, $s4, $t5			# $t5 = gridCopy + (i + 1) * GRID_COLS + j
-	lb	$t5, 0($t5)			# $t5 = gridCopy[(i + 1) * GRID_COLS + j]
+	add	$t5, $s4, $t5			# $t5 = gridCopy + i * GRID_COLS + j + GRID_COLS
+	lb	$t5, 0($t5)			# $t5 = gridCopy[i * GRID_COLS + j + GRID_COLS]
 	
 	li	$t6, 'X'			# $t6 = 'X'
-	bne	$t5, $t6, dpig_while_inner_inc	#continue if gridCopy[(i + 1) * GRID_COLS + j] != 'X'
+	bne	$t5, $t6, dpig_while_inner_inc	#continue if gridCopy[i * GRID_COLS + j + GRID_COLS] != 'X'
 						
 update_csgd:
 	li	$t1, 0				# $t1: canStillGoDown = 0
@@ -831,6 +827,21 @@ dpig_while_if_outer_b:
 dpig_while_if_inner_b:
 	bge	$t3, 6, dpig_while_if_inner_e	#branch if j >= 6
 	
+	li	$t4, GRID_COLS			# $t4 = GRID_COLS
+	mult	$t2, $t4			#multiplying i by GRID_COLS
+	mflo	$t5				# $t5 = i * GRID_COLS
+	add	$t5, $t3, $t5			# $t5 = i * GRID_COLS + j
+	add	$t5, $s4, $t5			# $t5 = gridCopy + i * GRID_COLS + j
+	lb	$t6, 0($t5)			# $t6 = gridCopy[i * GRID_COLS + j]
+	
+	li	$t7, '#'			# $t7 = '#'
+	bne	$t6, $t7, dpig_while_if_inner_inc
+
+	li	$t6, '.'			# $t6 = '.'
+	sb	$t6, 0($t5)			# gridCopy[i * GRID_COLS + j] = '.'
+	
+	add	$t5, $t4, $t5			# $t5 = (gridCopy + i * GRID_COLS + j) + GRID_COLS
+	sb	$t7, 0($t5)			# gridCopy[i * GRID_COLS + j + GRID_COLS] = '#'
 
 dpig_while_if_inner_inc:
 	addi	$t3, $t3, 1			# i += 1

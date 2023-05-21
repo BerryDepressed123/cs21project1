@@ -708,6 +708,54 @@ backtrack_e:
 
 	jr	$ra				#return
 
+drop_piece_in_grid:
+	# $a0 = grid[70]
+	# $a1 = piece[8]
+	# $a2 = yOffset
+	# $a3 = isSuccess
+	
+	#preamble
+	subu	$sp, $sp, 24			#make stack frame
+	sw	$ra, 20($sp)			#storing registers
+	sw 	$s0, 16($sp)			
+	sw	$s1, 12($sp)			
+	sw	$s2, 8($sp)
+	sw	$s3, 4($sp)
+	sw	$s4, 0($sp)
+	#preamble
+	
+	move	$s0, $a0			# $s0: grid
+	move	$s1, $a1			# $s1: piece
+	move	$s2, $a2			# $s2: yOffset
+	move	$s3, $a3			# $s3: isSuccess
+	
+	li	$a0, 70				#allocate 70 bytes
+	li	$v0, 9				#preparing for sbrk
+	syscall
+	move	$s4, $v0			# $s4: gridCopy
+	
+	move	$a0, $s0			# $a0 = grid
+	move	$a1, $s4			# $a1 = gridCopy
+	li	$a2, 70				# $a2 = 70
+	
+	jal	copy				#call copy
+	
+	li	$t0, 100			# $t0: maxY = 100
+	
+drop_piece_in_grid_e:
+	#end
+	lw	$ra, 20($sp)			#loading from respective stack frame
+	lw 	$s0, 16($sp)			
+	lw	$s1, 12($sp)			
+	lw	$s2, 8($sp)
+	lw	$s3, 4($sp)
+	lw	$s4, 0($sp)
+	addu	$sp, $sp, 24			#deallocate stack frame	
+	#end
+	
+	jr	$ra				#return
+
+
 .data
 yes:		.asciiz "YES\n"
 no:		.asciiz "NO\n"
